@@ -1,4 +1,4 @@
-package database
+package pgutil
 
 import (
 	"fmt"

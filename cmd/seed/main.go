@@ -9,7 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/mytheresa/go-hiring-challenge/app/database"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/pgutil"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Initialize database connection
-	db, close := database.New(
+	db, close := pgutil.New(
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PASSWORD"),
 		os.Getenv("POSTGRES_DB"),

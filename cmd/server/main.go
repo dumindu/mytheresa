@@ -10,9 +10,9 @@ import (
 	"syscall"
 
 	"github.com/joho/godotenv"
-	"github.com/mytheresa/go-hiring-challenge/app/catalog"
-	"github.com/mytheresa/go-hiring-challenge/app/database"
-	"github.com/mytheresa/go-hiring-challenge/models"
+
+	"github.com/mytheresa/go-hiring-challenge/internal/router"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/pgutil"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	defer stop()
 
 	// Initialize database connection
-	db, close := database.New(
+	db, close := pgutil.New(
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PASSWORD"),
 		os.Getenv("POSTGRES_DB"),
@@ -34,18 +34,13 @@ func main() {
 	)
 	defer close()
 
-	// Initialize handlers
-	prodRepo := models.NewProductsRepository(db)
-	cat := catalog.NewCatalogHandler(prodRepo)
-
-	// Set up routing
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /catalog", cat.HandleGet)
+	// Initialize router
+	r := router.New(db)
 
 	// Set up the HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("localhost:%s", os.Getenv("HTTP_PORT")),
-		Handler: mux,
+		Handler: r,
 	}
 
 	// Start the server
