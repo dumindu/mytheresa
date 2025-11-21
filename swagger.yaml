@@ -1,0 +1,208 @@
+definitions:
+  github_com_mytheresa_go-hiring-challenge_internal_errors.Error:
+    properties:
+      error:
+        type: string
+    type: object
+  github_com_mytheresa_go-hiring-challenge_internal_model.CategoryForm:
+    properties:
+      code:
+        maxLength: 32
+        type: string
+      name:
+        maxLength: 256
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  github_com_mytheresa_go-hiring-challenge_internal_model.CategoryResponse:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_mytheresa_go-hiring-challenge_internal_model.ProductResponse:
+    properties:
+      category:
+        $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_model.CategoryResponse'
+      code:
+        type: string
+      price:
+        type: number
+      variants:
+        items:
+          $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_model.VariantResponse'
+        type: array
+    type: object
+  github_com_mytheresa_go-hiring-challenge_internal_model.VariantResponse:
+    properties:
+      name:
+        type: string
+      price:
+        type: number
+      sku:
+        type: string
+    type: object
+  internal_app_category.ListResponse:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_model.CategoryResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_product.ListResponse:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_model.ProductResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+info:
+  contact:
+    name: Dumindu Madunuwan
+    url: https://www.linkedin.com/in/dumindunuwan
+  description: This is a sample RESTful API application
+  license:
+    name: MIT License
+    url: https://github.com/dumindu/mytheresa/blob/main/LICENSE
+  title: MYTHERESA.DEV API
+  version: "1.0"
+paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of product categories.
+      parameters:
+      - description: Maximum number of categories to return (pagination limit)
+        in: query
+        name: limit
+        type: integer
+      - description: Number of categories to skip (pagination offset)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories with total count
+          schema:
+            $ref: '#/definitions/internal_app_category.ListResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+      summary: List product categories
+      tags:
+      - categories
+  /category:
+    post:
+      consumes:
+      - application/json
+      description: Create a new product category using the provided payload.
+      parameters:
+      - description: Category create form
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_model.CategoryForm'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: Category with the same code already exists
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+      summary: Create a product category
+      tags:
+      - categories
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of products, optionally filtered by category
+        and maximum price.
+      parameters:
+      - description: Maximum number of products per request (pagination limit)
+        in: query
+        name: limit
+        type: integer
+      - description: Number of products to skip (pagination offset)
+        in: query
+        name: offset
+        type: integer
+      - description: Filter by category name (e.g. Clothing, Shoes, Accessories)
+        in: query
+        name: category
+        type: string
+      - description: Return products/variants with effective price less than this
+          value
+        in: query
+        name: price-lt
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of products with total count
+          schema:
+            $ref: '#/definitions/internal_app_product.ListResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+      summary: List products
+      tags:
+      - products
+  /products/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a single product by its unique product code.
+      parameters:
+      - description: Product code (e.g. PROD001)
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product found
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_model.ProductResponse'
+        "400":
+          description: Invalid or missing product code
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_mytheresa_go-hiring-challenge_internal_errors.Error'
+      summary: Get a product by code
+      tags:
+      - products
+swagger: "2.0"

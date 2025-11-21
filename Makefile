@@ -16,6 +16,11 @@ run ::
 test ::
 	@go test -v -count=1 -race ./... -coverprofile=coverage.out -covermode=atomic
 
+lint ::
+	@gofumpt -l -w .
+	@go vet ./...
+	@staticcheck ./...
+
 docker-up ::
 	docker compose up -d
 
