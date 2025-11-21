@@ -1,11 +1,10 @@
-package product
+package category
 
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	e "github.com/mytheresa/go-hiring-challenge/internal/errors"
@@ -18,70 +17,66 @@ import (
 
 type (
 	API struct {
-		repo   *repository.ProductRepository
+		repo   *repository.CategoryRepository
 		logger *l.Logger
 	}
 
 	ListResponse struct {
-		Products []*model.ProductResponse `json:"products"`
-		Total    int64                    `json:"total"`
+		Categories []*model.CategoryResponse `json:"categories"`
+		Total      int64                     `json:"total"`
 	}
 )
 
 func New(db *gorm.DB, logger *l.Logger) *API {
 	return &API{
-		repo:   repository.NewProductRepository(db),
+		repo:   repository.NewCategoryRepository(db),
 		logger: logger,
 	}
 }
 
-func (api *API) GetByCode(w http.ResponseWriter, r *http.Request) {
+func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	reqID := ctxutil.RequestID(r.Context())
 
-	code := chi.URLParam(r, "code")
-	if code == "" {
-		e.BadRequest(w, e.RespInvalidCode)
+	form := &model.CategoryForm{}
+	if err := json.NewDecoder(r.Body).Decode(form); err != nil {
+		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
+		e.ServerError(w, e.RespJSONDecodeErr)
 		return
 	}
 
-	product, err := api.repo.GetOneByCode(code)
+	// TODO: validate
+	// e.UnprocessableEntity
+
+	newCategory := form.ToModel()
+	category, err := api.repo.Create(newCategory)
 	if err != nil {
+		if e.IsDuplicateDBEntry(err.Error()) {
+			e.Conflict(w, e.RespConflictErr)
+			return
+		}
+
 		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
-		e.ServerError(w, e.RespRepoDataAccessErr)
+		e.ServerError(w, e.RespRepoDataInsertErr)
 		return
 	}
 
-	if product == nil {
-		e.NotFound(w, e.RespNotFoundErr)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(&product); err != nil {
-		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
-		e.ServerError(w, e.RespJSONEncodeErr)
-		return
-	}
+	api.logger.Info().Str(l.KeyReqID, reqID).Str("id", strconv.Itoa(int(category.ID))).Msg("new category created")
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (api *API) GetAll(w http.ResponseWriter, r *http.Request) {
 	reqID := ctxutil.RequestID(r.Context())
 
 	limit, offset := requestutil.ParseQueryParamLimitOffset(r)
-	priceLessThan, _ := decimal.NewFromString(r.URL.Query().Get("price-lt"))
 
-	filter := &model.ProductFilter{
-		Category:      r.URL.Query().Get("category"),
-		PriceLessThan: priceLessThan,
-	}
-
-	products, err := api.repo.GetAllWithFilter(limit, offset, filter)
+	categories, err := api.repo.GetAll(limit, offset)
 	if err != nil {
 		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
 		e.ServerError(w, e.RespRepoDataAccessErr)
 		return
 	}
 
-	productsCount, err := api.repo.CountAllWithFilter(filter)
+	categoryCount, err := api.repo.CountAll()
 	if err != nil {
 		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
 		e.ServerError(w, e.RespRepoDataAccessErr)
@@ -89,8 +84,8 @@ func (api *API) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := &ListResponse{
-		Products: products.ToResponse(),
-		Total:    productsCount,
+		Categories: categories.ToResponse(),
+		Total:      categoryCount,
 	}
 
 	if err := json.NewEncoder(w).Encode(resp); err != nil {

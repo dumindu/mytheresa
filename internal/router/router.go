@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/cors"
 	"gorm.io/gorm"
 
+	"github.com/mytheresa/go-hiring-challenge/internal/app/category"
 	"github.com/mytheresa/go-hiring-challenge/internal/app/product"
 	"github.com/mytheresa/go-hiring-challenge/internal/router/middleware"
 	reqL "github.com/mytheresa/go-hiring-challenge/internal/router/middleware/requestlog"
@@ -35,7 +36,12 @@ func New(db *gorm.DB, l *logger.Logger) *chi.Mux {
 		r.Use(middleware.ContentTypeJSON)
 
 		productAPI := product.New(db, l)
+		r.Method(http.MethodGet, "/products/{code}", reqL.NewHandler(productAPI.GetByCode, l))
 		r.Method(http.MethodGet, "/products", reqL.NewHandler(productAPI.GetAll, l))
+
+		categoryAPI := category.New(db, l)
+		r.Method(http.MethodPost, "/categories", reqL.NewHandler(categoryAPI.Create, l))
+		r.Method(http.MethodGet, "/categories", reqL.NewHandler(categoryAPI.GetAll, l))
 	})
 
 	return r

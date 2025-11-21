@@ -1,0 +1,194 @@
+{
+	"products": [
+		{
+			"code": "PROD001",
+			"price": 10.99,
+			"category": {
+				"code": "CAT001",
+				"name": "Clothing"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU001A",
+					"price": 11.99
+				},
+				{
+					"name": "Variant B",
+					"sku": "SKU001B",
+					"price": 10.99
+				},
+				{
+					"name": "Variant C",
+					"sku": "SKU001C",
+					"price": 10.99
+				}
+			]
+		},
+		{
+			"code": "PROD004",
+			"price": 15,
+			"category": {
+				"code": "CAT001",
+				"name": "Clothing"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU004A",
+					"price": 15.5
+				},
+				{
+					"name": "Variant B",
+					"sku": "SKU004B",
+					"price": 16
+				},
+				{
+					"name": "Variant C",
+					"sku": "SKU004C",
+					"price": 15
+				},
+				{
+					"name": "Variant D",
+					"sku": "SKU004D",
+					"price": 16.99
+				}
+			]
+		},
+		{
+			"code": "PROD007",
+			"price": 18.2,
+			"category": {
+				"code": "CAT001",
+				"name": "Clothing"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU007A",
+					"price": 18.2
+				},
+				{
+					"name": "Variant B",
+					"sku": "SKU007B",
+					"price": 18.2
+				},
+				{
+					"name": "Variant C",
+					"sku": "SKU007C",
+					"price": 18.2
+				},
+				{
+					"name": "Variant D",
+					"sku": "SKU007D",
+					"price": 18.2
+				},
+				{
+					"name": "Variant E",
+					"sku": "SKU007E",
+					"price": 18.75
+				}
+			]
+		},
+		{
+			"code": "PROD002",
+			"price": 12.49,
+			"category": {
+				"code": "CAT002",
+				"name": "Shoes"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU002A",
+					"price": 12.49
+				},
+				{
+					"name": "Variant B",
+					"sku": "SKU002B",
+					"price": 12.49
+				}
+			]
+		},
+		{
+			"code": "PROD006",
+			"price": 5.5,
+			"category": {
+				"code": "CAT002",
+				"name": "Shoes"
+			},
+			"variants": []
+		},
+		{
+			"code": "PROD003",
+			"price": 8.75,
+			"category": {
+				"code": "CAT003",
+				"name": "Accessories"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU003A",
+					"price": 8.99
+				}
+			]
+		},
+		{
+			"code": "PROD005",
+			"price": 22.99,
+			"category": {
+				"code": "CAT003",
+				"name": "Accessories"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU005A",
+					"price": 23.99
+				},
+				{
+					"name": "Variant B",
+					"sku": "SKU005B",
+					"price": 22.99
+				},
+				{
+					"name": "Variant C",
+					"sku": "SKU005C",
+					"price": 22.99
+				},
+				{
+					"name": "Variant D",
+					"sku": "SKU005D",
+					"price": 22.99
+				},
+				{
+					"name": "Variant E",
+					"sku": "SKU005E",
+					"price": 23.49
+				},
+				{
+					"name": "Variant F",
+					"sku": "SKU005F",
+					"price": 22.99
+				}
+			]
+		},
+		{
+			"code": "PROD008",
+			"price": 9.99,
+			"category": {
+				"code": "CAT003",
+				"name": "Accessories"
+			},
+			"variants": [
+				{
+					"name": "Variant A",
+					"sku": "SKU008A",
+					"price": 10.49
+				}
+			]
+		}
+	],
+	"total": 8
+}
