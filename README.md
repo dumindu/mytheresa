@@ -1,34 +1,59 @@
-# Go Hiring Challenge
+![cover.jpg](cover.jpg)
 
-This repository contains a Go application for managing products and their prices, including functionalities for CRUD operations and seeding the database with initial data.
+# README
 
 ## Project Structure
 
-1. **cmd/**: Contains the main application and seed command entry points.
+```
+├── cmd                     # Application entrypoints (binaries)
+│   ├── server              # Main HTTP API server (main.go, wiring, startup)
+│   └── seed                # CLI tool to seed the database with initial data
+├── internal                # Private application code (not exposed as a module)
+│   ├── app                 # Core application/business logic
+│   │   ├── category        # Category use-cases/handlers/services
+│   │   └── product         # Product use-cases/handlers/services
+│   ├── router              # HTTP routing setup
+│   │   ├── middleware      # Shared HTTP middleware (logging, conntext typing, etc.)
+│   │   └── router.go       # Router initialization and route registration
+│   ├── config              # Configuration loading and environment handling
+│   ├── errors              # Centralized error types and error handling helpers
+│   ├── model               # Domain models/entities
+│   │   ├── category.go     # Category model definition
+│   │   ├── product.go      # Product model definition
+│   │   └── variant.go      # Product variant model definition
+│   ├── repository          # Data access layer (database persistence)
+│   │   ├── category.go     # Category repository implementation
+│   │   └── product.go      # Product repository implementation
+│   └── util                # Shared utilities/helpers
+├── sql                     # Database migrations and SQL scripts
+├── Dockerfile              # Docker image build definition for the app
+├── compose.yml             # Docker Compose setup for local infrastructure
+├── bin                     # Local tooling binaries used by the project
+│   ├── gofumpt             # Code formatter
+│   ├── govulncheck         # Go vulnerability scanner
+│   ├── staticcheck         # Advanced static analysis tool
+│   └── swag                # Swagger/OpenAPI generator CLI
+└── swagger.yaml            # OpenAPI/Swagger specification for the HTTP API
+```
 
-   - `server/main.go`: The main application entry point, serves the REST API.
-   - `seed/main.go`: Command to seed the database with initial product data.
+💡 [swaggo/swag](https://github.com/swaggo/swag) : `swag init -g cmd/server/main.go -o . -ot yaml --parseDependency --parseInternal `
 
-2. **app/**: Contains the application logic.
-3. **sql/**: Contains a very simple database migration scripts setup.
-4. **models/**: Contains the data models and repositories used in the application.
-5. `.env`: Environment variables file for configuration.
+## Setup dev environment
 
-## Setup Code Repository
+- Install [Docker Application](https://www.docker.com/products/docker-desktop) in the development environment.
+- `cd path/to/dumindu/mytheresa && docker-compose build && docker-compose up`
 
-1. Create a github/bitbucket/gitlab repository and push all this code as-is.
-2. Create a new branch, and provide a pull-request against the main branch with your changes. Instructions to follow.
+### Install dev dependencies
 
-## Application Setup
+- Install [Go](https://go.dev/dl/).
+- [Set `GOPATH`](https://github.com/golang/go/wiki/SettingGOPATH#setting-gopath) and `GOPATH\bin` (
+  Linux/macOS: `export PATH=$PATH:$GOPATH/bin`)
+- `go install github.com/swaggo/swag/cmd/swag@latest`
+- `go install mvdan.cc/gofumpt@latest`
+- `go install honnef.co/go/tools/cmd/staticcheck@latest`
+- `go install golang.org/x/vuln/cmd/govulncheck@latest`
 
-- Ensure you have Go installed on your machine.
-- Ensure you have Docker installed on your machine.
-- Important makefile targets:
-  - `make tidy`: will install all dependencies.
-  - `make docker-up`: will start the required infrastructure services via docker containers.
-  - `make seed`: ⚠️ Will destroy and re-create the database tables.
-  - `make test`: Will run the tests.
-  - `make run`: Will start the application.
-  - `make docker-down`: Will stop the docker containers.
 
-Follow up for the assignemnt here: [ASSIGNMENT.md](ASSIGNMENT.md)
+> This repository contains a Go application for managing products and their prices, including functionalities for CRUD operations and seeding the database with initial data.
+
+
