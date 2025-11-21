@@ -35,6 +35,22 @@ func New(db *gorm.DB, logger *l.Logger) *API {
 	}
 }
 
+// GetByCode
+//
+//	@summary		Get a product by code
+//	@description	Retrieve a single product by its unique product code.
+//	@tags			products
+//
+//	@router			/products/{code} [GET]
+//	@accept			json
+//	@produce		json
+//
+//	@param			code	path		string					true	"Product code (e.g. PROD001)"
+//
+//	@success		200		{object}	model.ProductResponse	"Product found"
+//	@failure		400		{object}	e.Error					"Invalid or missing product code"
+//	@failure		404		{object}	e.Error					"Product not found"
+//	@failure		500		{object}	e.Error					"Internal server error"
 func (api *API) GetByCode(w http.ResponseWriter, r *http.Request) {
 	reqID := ctxutil.RequestID(r.Context())
 
@@ -56,13 +72,30 @@ func (api *API) GetByCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&product); err != nil {
+	if err := json.NewEncoder(w).Encode(product.ToResponse()); err != nil {
 		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
 		e.ServerError(w, e.RespJSONEncodeErr)
 		return
 	}
 }
 
+// GetAll
+//
+//	@summary		List products
+//	@description	Retrieve a paginated list of products, optionally filtered by category and maximum price.
+//	@tags			products
+//
+//	@router			/products [GET]
+//	@accept			json
+//	@produce		json
+//
+//	@param			limit		query		int				false	"Maximum number of products per request (pagination limit)"
+//	@param			offset		query		int				false	"Number of products to skip (pagination offset)"
+//	@param			category	query		string			false	"Filter by category name (e.g. Clothing, Shoes, Accessories)"
+//	@param			price-lt	query		number			false	"Return products/variants with effective price less than this value"
+//
+//	@success		200			{object}	ListResponse	"List of products with total count"
+//	@failure		500			{object}	e.Error			"Internal server error"
 func (api *API) GetAll(w http.ResponseWriter, r *http.Request) {
 	reqID := ctxutil.RequestID(r.Context())
 

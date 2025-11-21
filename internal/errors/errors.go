@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+type Error struct {
+	Error string `json:"error"`
+}
+
 var (
 	RespInvalidCode = []byte(`{"error": "invalid code"}`)
 

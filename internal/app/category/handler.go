@@ -34,6 +34,21 @@ func New(db *gorm.DB, logger *l.Logger) *API {
 	}
 }
 
+// Create
+//
+//	@summary		Create a product category
+//	@description	Create a new product category using the provided payload.
+//	@tags			categories
+//
+//	@router			/category [POST]
+//	@accept			json
+//	@produce		json
+//	@param			body	body	model.CategoryForm	true	"Category create form"
+//
+//	@success		201
+//	@failure		409	{object}	e.Error	"Category with the same code already exists"
+//	@failure		422	{object}	e.Error	"Validation failed"
+//	@failure		500	{object}	e.Error	"Internal server error"
 func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	reqID := ctxutil.RequestID(r.Context())
 
@@ -64,6 +79,20 @@ func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// GetAll
+//
+//	@summary		List product categories
+//	@description	Retrieve a paginated list of product categories.
+//	@tags			categories
+//
+//	@router			/categories [GET]
+//	@accept			json
+//	@produce		json
+//	@param			limit	query		int				false	"Maximum number of categories to return (pagination limit)"
+//	@param			offset	query		int				false	"Number of categories to skip (pagination offset)"
+//
+//	@success		200		{object}	ListResponse	"List of categories with total count"
+//	@failure		500		{object}	e.Error			"Internal server error"
 func (api *API) GetAll(w http.ResponseWriter, r *http.Request) {
 	reqID := ctxutil.RequestID(r.Context())
 

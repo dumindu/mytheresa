@@ -14,6 +14,17 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/internal/util/pgutil"
 )
 
+//	@title			MYTHERESA.DEV API
+//	@version		1.0
+//	@description	This is a sample RESTful API application
+
+//	@contact.name	Dumindu Madunuwan
+//	@contact.url	https://www.linkedin.com/in/dumindunuwan
+
+//	@license.name	MIT License
+//	@license.url	https://github.com/dumindu/mytheresa/blob/main/LICENSE
+
+// @servers.url	localhost:8080/v1
 func main() {
 	// Initialize configuration and logger
 	c := config.New()

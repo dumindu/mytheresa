@@ -36,3 +36,6 @@ jobs:
 
     - name: Govulncheck
       run: ./bin/govulncheck ./...
+
+    - name: Check swagger doc errors
+      run: ./bin/swag init -g cmd/server/main.go -o . -ot yaml --parseDependency --parseInternal

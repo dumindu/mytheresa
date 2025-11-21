@@ -26,13 +26,17 @@ type (
 func (cs Categories) ToResponse() []*CategoryResponse {
 	categories := make([]*CategoryResponse, len(cs))
 	for i, c := range cs {
-		categories[i] = &CategoryResponse{
-			Code: c.Code,
-			Name: c.Name,
-		}
+		categories[i] = c.ToResponse()
 	}
 
 	return categories
+}
+
+func (c *Category) ToResponse() *CategoryResponse {
+	return &CategoryResponse{
+		Code: c.Code,
+		Name: c.Name,
+	}
 }
 
 func (f *CategoryForm) ToModel() *Category {

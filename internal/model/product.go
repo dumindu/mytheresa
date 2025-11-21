@@ -36,19 +36,22 @@ type (
 func (ps Products) ToResponse() []*ProductResponse {
 	products := make([]*ProductResponse, len(ps))
 	for i, p := range ps {
-		products[i] = &ProductResponse{
-			Code:     p.Code,
-			Price:    p.Price.InexactFloat64(),
-			Variants: p.Variants.ToResponse(p.Price),
-		}
-
-		if p.Category != nil {
-			products[i].Category = &CategoryResponse{
-				Code: p.Category.Code,
-				Name: p.Category.Name,
-			}
-		}
+		products[i] = p.ToResponse()
 	}
 
 	return products
+}
+
+func (p *Product) ToResponse() *ProductResponse {
+	product := &ProductResponse{
+		Code:     p.Code,
+		Price:    p.Price.InexactFloat64(),
+		Variants: p.Variants.ToResponse(p.Price),
+	}
+
+	if p.Category != nil {
+		product.Category = p.Category.ToResponse()
+	}
+
+	return product
 }
