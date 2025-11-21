@@ -5,42 +5,38 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/joho/godotenv"
-
+	"github.com/mytheresa/go-hiring-challenge/internal/config"
 	"github.com/mytheresa/go-hiring-challenge/internal/router"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/logger"
 	"github.com/mytheresa/go-hiring-challenge/internal/util/pgutil"
 )
 
 func main() {
-	// Load environment variables from .env file
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
-	}
+	// Initialize configuration and logger
+	c := config.New()
+	l := logger.New(c.Server.Debug)
 
 	// signal handling for graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	// Initialize database connection
-	db, close := pgutil.New(
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_DB"),
-		os.Getenv("POSTGRES_PORT"),
-	)
+	db, close := pgutil.New(&c.DB)
 	defer close()
 
 	// Initialize router
-	r := router.New(db)
+	r := router.New(db, l)
 
 	// Set up the HTTP server
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("localhost:%s", os.Getenv("HTTP_PORT")),
-		Handler: r,
+		Addr:         fmt.Sprintf(":%d", c.Server.Port),
+		Handler:      r,
+		ReadTimeout:  c.Server.TimeoutRead,
+		WriteTimeout: c.Server.TimeoutWrite,
+		IdleTimeout:  c.Server.TimeoutIdle,
 	}
 
 	// Start the server

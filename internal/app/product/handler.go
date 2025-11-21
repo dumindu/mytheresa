@@ -9,11 +9,14 @@ import (
 	e "github.com/mytheresa/go-hiring-challenge/internal/errors"
 	"github.com/mytheresa/go-hiring-challenge/internal/model"
 	"github.com/mytheresa/go-hiring-challenge/internal/repository"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/ctxutil"
+	l "github.com/mytheresa/go-hiring-challenge/internal/util/logger"
 )
 
 type (
 	API struct {
-		repo *repository.ProductsRepository
+		repo   *repository.ProductsRepository
+		logger *l.Logger
 	}
 
 	ListResponse struct {
@@ -21,16 +24,19 @@ type (
 	}
 )
 
-func New(db *gorm.DB) *API {
+func New(db *gorm.DB, logger *l.Logger) *API {
 	return &API{
-		repo: repository.NewProductsRepository(db),
+		repo:   repository.NewProductsRepository(db),
+		logger: logger,
 	}
 }
 
 func (api *API) GetAll(w http.ResponseWriter, r *http.Request) {
+	reqID := ctxutil.RequestID(r.Context())
+
 	products, err := api.repo.GetAllProducts()
 	if err != nil {
-		// TODO: log error
+		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
 		e.ServerError(w, e.RespRepoDataAccessErr)
 		return
 	}
@@ -40,7 +46,7 @@ func (api *API) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		// TODO: log error
+		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
 		e.ServerError(w, e.RespJSONEncodeErr)
 		return
 	}

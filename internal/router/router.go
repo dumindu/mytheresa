@@ -9,9 +9,11 @@ import (
 
 	"github.com/mytheresa/go-hiring-challenge/internal/app/product"
 	"github.com/mytheresa/go-hiring-challenge/internal/router/middleware"
+	reqL "github.com/mytheresa/go-hiring-challenge/internal/router/middleware/requestlog"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/logger"
 )
 
-func New(db *gorm.DB) *chi.Mux {
+func New(db *gorm.DB, l *logger.Logger) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Get("/livez", func(w http.ResponseWriter, _ *http.Request) {
@@ -29,10 +31,11 @@ func New(db *gorm.DB) *chi.Mux {
 
 	r.Route("/v1", func(r chi.Router) {
 		r.Use(cors.Handler)
+		r.Use(middleware.RequestID)
 		r.Use(middleware.ContentTypeJSON)
 
-		productAPI := product.New(db)
-		r.Get("/products", productAPI.GetAll)
+		productAPI := product.New(db, l)
+		r.Method(http.MethodGet, "/products", reqL.NewHandler(productAPI.GetAll, l))
 	})
 
 	return r

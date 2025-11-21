@@ -2,10 +2,16 @@ tidy ::
 	@go mod tidy && go mod vendor
 
 seed ::
-	@go run cmd/seed/main.go
+	@set -a; \
+	. .env; \
+	set +a; \
+	DB_HOST=localhost go run cmd/seed/main.go
 
 run ::
-	@go run cmd/server/main.go
+	@set -a; \
+	. .env; \
+	set +a; \
+	DB_HOST=localhost go run cmd/server/main.go
 
 test ::
 	@go test -v -count=1 -race ./... -coverprofile=coverage.out -covermode=atomic
