@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 
 	e "github.com/mytheresa/go-hiring-challenge/internal/errors"
@@ -13,12 +14,14 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/internal/util/ctxutil"
 	l "github.com/mytheresa/go-hiring-challenge/internal/util/logger"
 	"github.com/mytheresa/go-hiring-challenge/internal/util/requestutil"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/validatorutil"
 )
 
 type (
 	API struct {
-		repo   *repository.CategoryRepository
-		logger *l.Logger
+		repo      *repository.CategoryRepository
+		logger    *l.Logger
+		validator *validator.Validate
 	}
 
 	ListResponse struct {
@@ -27,10 +30,11 @@ type (
 	}
 )
 
-func New(db *gorm.DB, logger *l.Logger) *API {
+func New(db *gorm.DB, logger *l.Logger, validator *validator.Validate) *API {
 	return &API{
-		repo:   repository.NewCategoryRepository(db),
-		logger: logger,
+		repo:      repository.NewCategoryRepository(db),
+		logger:    logger,
+		validator: validator,
 	}
 }
 
@@ -56,6 +60,18 @@ func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(form); err != nil {
 		api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
 		e.ServerError(w, e.RespJSONDecodeErr)
+		return
+	}
+
+	if err := api.validator.Struct(form); err != nil {
+		respBody, err := json.Marshal(validatorutil.ToErrResponse(err))
+		if err != nil {
+			api.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("")
+			e.ServerError(w, e.RespJSONEncodeErr)
+			return
+		}
+
+		e.ValidationErrors(w, respBody)
 		return
 	}
 
