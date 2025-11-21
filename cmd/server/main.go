@@ -12,6 +12,7 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/internal/router"
 	"github.com/mytheresa/go-hiring-challenge/internal/util/logger"
 	"github.com/mytheresa/go-hiring-challenge/internal/util/pgutil"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/validatorutil"
 )
 
 //	@title			MYTHERESA.DEV API
@@ -26,9 +27,10 @@ import (
 
 // @servers.url	localhost:8080/v1
 func main() {
-	// Initialize configuration and logger
+	// Initialize configuration, logger, and validator
 	c := config.New()
 	l := logger.New(c.Server.Debug)
+	v := validatorutil.New()
 
 	// signal handling for graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -39,7 +41,7 @@ func main() {
 	defer close()
 
 	// Initialize router
-	r := router.New(db, l)
+	r := router.New(db, l, v)
 
 	// Set up the HTTP server
 	srv := &http.Server{

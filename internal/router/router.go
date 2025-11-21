@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 
 	"github.com/mytheresa/go-hiring-challenge/internal/app/category"
@@ -14,7 +15,7 @@ import (
 	"github.com/mytheresa/go-hiring-challenge/internal/util/logger"
 )
 
-func New(db *gorm.DB, l *logger.Logger) *chi.Mux {
+func New(db *gorm.DB, l *logger.Logger, v *validator.Validate) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Get("/livez", func(w http.ResponseWriter, _ *http.Request) {
@@ -39,7 +40,7 @@ func New(db *gorm.DB, l *logger.Logger) *chi.Mux {
 		r.Method(http.MethodGet, "/products/{code}", reqL.NewHandler(productAPI.GetByCode, l))
 		r.Method(http.MethodGet, "/products", reqL.NewHandler(productAPI.GetAll, l))
 
-		categoryAPI := category.New(db, l)
+		categoryAPI := category.New(db, l, v)
 		r.Method(http.MethodPost, "/categories", reqL.NewHandler(categoryAPI.Create, l))
 		r.Method(http.MethodGet, "/categories", reqL.NewHandler(categoryAPI.GetAll, l))
 	})
