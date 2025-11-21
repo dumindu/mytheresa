@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/mytheresa/go-hiring-challenge/internal/config"
 )
 
-func New(user, password, dbname, port string) (db *gorm.DB, close func() error) {
-	dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", user, password, port, dbname)
+func New(conf *config.ConfDB) (db *gorm.DB, close func() error) {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		conf.Username, conf.Password, conf.Host, conf.Port, conf.DBName)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

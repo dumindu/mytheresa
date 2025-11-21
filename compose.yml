@@ -1,14 +1,26 @@
 services:
+  app:
+    build: .
+    container_name: mytheresa-dev-app
+    env_file: .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: [ "sh", "-c", "/app/bin/seed up && /app/bin/server" ]
+
   postgres:
     image: postgres:18.1-alpine
+    container_name: mytheresa-dev-db
     environment:
-      POSTGRES_DB: challenge
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mytheresa
+      POSTGRES_USER: mytheresa
+      POSTGRES_PASSWORD: mytheresa
     ports:
       - "5432:5432"
     healthcheck:
-      test: pg_isready
+      test: [ "CMD-SHELL", "pg_isready -U mytheresa -d mytheresa" ]
       interval: 5s
       timeout: 5s
       retries: 5
