@@ -37,14 +37,14 @@ func Conflict(w http.ResponseWriter, error []byte) {
 	w.Write(error)
 }
 
-func ValidationErrors(w http.ResponseWriter, reps []byte) {
-	w.WriteHeader(http.StatusUnprocessableEntity)
-	w.Write(reps)
-}
-
 func ServerError(w http.ResponseWriter, error []byte) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write(error)
+}
+
+func ValidationErrors(w http.ResponseWriter, reps []byte) {
+	w.WriteHeader(http.StatusUnprocessableEntity)
+	w.Write(reps)
 }
 
 func IsDuplicateDBEntry(errStr string) bool {

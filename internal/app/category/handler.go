@@ -44,7 +44,7 @@ func New(db *gorm.DB, logger *l.Logger, validator *validator.Validate) *API {
 //	@description	Create a new product category using the provided payload.
 //	@tags			categories
 //
-//	@router			/category [POST]
+//	@router			/categories [POST]
 //	@accept			json
 //	@produce		json
 //	@param			body	body	model.CategoryForm	true	"Category create form"
@@ -74,9 +74,6 @@ func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 		e.ValidationErrors(w, respBody)
 		return
 	}
-
-	// TODO: validate
-	// e.UnprocessableEntity
 
 	newCategory := form.ToModel()
 	category, err := api.repo.Create(newCategory)
