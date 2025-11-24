@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+#    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: '1.25'
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v -count=1 -race ./...
+
+    - name: Gofumpt
+      run: ./bin/gofumpt -l -w . 2>&1 | tee outfile && test -z "$(cat outfile)" && rm outfile
+
+    - name: Go Vet
+      run: go vet ./...
+
+    - name: Staticcheck
+      run: ./bin/staticcheck ./...
+
+    - name: Govulncheck
+      run: ./bin/govulncheck ./...
+
+    - name: Check swagger doc errors
+      run: ./bin/swag init -g cmd/server/main.go -o . -ot yaml --parseDependency --parseInternal

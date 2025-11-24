@@ -7,28 +7,19 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/joho/godotenv"
-
-	"github.com/mytheresa/go-hiring-challenge/app/database"
+	"github.com/mytheresa/go-hiring-challenge/internal/config"
+	"github.com/mytheresa/go-hiring-challenge/internal/util/pgutil"
 )
 
 func main() {
-	// Load environment variables from .env file
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
-	}
+	// Load DB configuration
+	c := config.NewDB()
 
 	// Initialize database connection
-	db, close := database.New(
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_DB"),
-		os.Getenv("POSTGRES_PORT"),
-	)
+	db, close := pgutil.New(c)
 	defer close()
 
-	dir := os.Getenv("POSTGRES_SQL_DIR")
-	files, err := os.ReadDir(dir)
+	files, err := os.ReadDir(c.SQLDirectory)
 	if err != nil {
 		log.Fatalf("reading directory failed: %v", err)
 	}
@@ -45,7 +36,7 @@ func main() {
 	})
 
 	for _, file := range sqlFiles {
-		path := filepath.Join(dir, file.Name())
+		path := filepath.Join(c.SQLDirectory, file.Name())
 
 		content, err := os.ReadFile(path)
 		if err != nil {
